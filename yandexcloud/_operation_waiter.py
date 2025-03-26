@@ -81,7 +81,13 @@ def get_operation_result(
     logger.info(message)
     result = wait_for_operation(sdk, operation.id, timeout=timeout)
     if result is None:
-        return OperationError(message="Unexpected operation result", operation_result=OperationResult(operation))
+        return OperationError(message="Unexpected operation result", operation_result=operation_result)
+    
+    if response_type and response_type is not Empty:
+        unpacked_response = response_type()
+        result.response.Unpack(unpacked_response)
+        operation_result.response = unpacked_response
+
     if result.error and result.error.code:
         error_message = (
             "Error Yandex.Cloud operation. ID: {id}. Error code: {code}. Details: {details}. Message: {message}."
@@ -93,14 +99,13 @@ def get_operation_result(
             message=result.error.message,
         )
         logger.error(error_message)
-        raise OperationError(message=error_message, operation_result=OperationResult(operation))
+        logger.info(" Response: %s.", operation_result.response)
+        logger.info(" Meta: %s.", operation_result.meta)
+        raise OperationError(message=error_message, operation_result=operation_result)
 
     log_message = f"Done Yandex.Cloud operation. ID: {operation.id}."
     if response_type and response_type is not Empty:
-        unpacked_response = response_type()
-        result.response.Unpack(unpacked_response)
-        operation_result.response = unpacked_response
-        log_message += f" Response: {unpacked_response}."
+        log_message += f" Response: {operation_result.response}."
     logger.info(log_message)
     return operation_result
 
