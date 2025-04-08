@@ -1,10 +1,11 @@
 [build-system]
+version = "0.341.0"
 requires = ["setuptools>=61.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "yandexcloud"
-version = "0.340.0"
+version = "0.341.0"
 authors = [{name = "Yandex LLC", email = "cloud@support.yandex.ru"}]
 license = {text = "MIT"}
 description = "The Yandex Cloud official SDK"
@@ -80,8 +81,10 @@ namespaces = false
 
 [tool.semantic_release]
 version_variables = ["yandexcloud/__init__.py:__version__"]
-version_toml = ["pyproject.toml:project.version"]
-# https://python-semantic-release.readthedocs.io/en/latest/configuration.html#major-on-zero
+version_toml = [
+    "pyproject.toml:build-system.version",
+    "pyproject.toml:project.version"
+]
 major_on_zero = false
 commit_parser = "angular"
 
